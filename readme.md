@@ -1,6 +1,6 @@
 # **Instruções para Rodar o Projeto**
 
-Este repositório contém o Teste Automatizado de Validação em Cypress . 
+Este repositório contém o Teste Automatizado de Validação em Cypress para empresa DNA Specialty. 
 
 # **⚠ Aviso**
 TODO RELATÓRIO SE ENCONTRA NA PASTA CYPRESS/REPORTS em HTML e JSON
