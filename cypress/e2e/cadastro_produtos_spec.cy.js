@@ -2,7 +2,7 @@ describe('Formulário de Cadastro de Produtos', () => {
   
   beforeEach(() => {
     // Carregar a página antes de cada teste
-    cy.visit('http://127.0.0.1:5500/index.html'); 
+    cy.visit('index.html');; 
   });
 
   it('Deve exibir erro se o nome do produto for inválido', () => {
