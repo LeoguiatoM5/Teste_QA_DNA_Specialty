@@ -1,39 +1,39 @@
 trigger:
-- main  # Ou a branch que você deseja que acione o pipeline
+  branches:
+    include:
+      - master  # Altere para a branch que você deseja monitorar (ex: master ou main)
 
 pool:
-  vmImage: 'ubuntu-latest'  # A máquina virtual onde o pipeline será executado
+  vmImage: 'ubuntu-latest'  # Usa a imagem mais recente do Ubuntu
 
 steps:
-# Passo 1: Instalar o Node.js
+# 1. Instalar o Node.js
 - task: UseNode@1
   inputs:
-    versionSpec: '14.x'  # Versão do Node.js, você pode mudar conforme necessário
+    versionSpec: '14.x'  # Versão do Node.js, ajuste conforme necessário
   displayName: 'Install Node.js'
 
-# Passo 2: Fazer o checkout do repositório
-- task: Checkout@1
-  displayName: 'Checkout GitHub Repository'
-
-# Passo 3: Instalar as dependências do projeto
+# 2. Instalar as dependências do projeto
 - script: |
     npm install
-  displayName: 'Install Dependencies'
+  displayName: 'Install dependencies'
 
-# Passo 4: Executar os testes Cypress
+# 3. Rodar os testes do Cypress
 - script: |
-    npx cypress run
+    npx cypress run --reporter mochawesome
   displayName: 'Run Cypress Tests'
 
-# Passo 5: Publicar os resultados do teste (se você estiver usando Mochawesome)
-- script: |
-    npx mochawesome-merge cypress/reports/*.json > cypress/reports/all-tests.json
-    npx mochawesome-report-generator cypress/reports/all-tests.json
-  displayName: 'Generate and Publish Test Reports'
+# 4. Gerar o relatório de testes
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'cypress/results'  # Pasta onde os resultados de teste são armazenados
+    ArtifactName: 'TestResults'
+    publishLocation: 'Container'
+  displayName: 'Publish Test Results'
 
-# Passo 6: Publicar os resultados no Azure DevOps (formato JUnit)
+# 5. Publicar os relatórios Mochawesome (opcional)
 - task: PublishTestResults@2
   inputs:
-    testResultsFiles: 'cypress/results/**/*.xml'
+    testResultsFiles: '**/mochawesome-report/*.json'
     testRunTitle: 'Cypress Test Run'
-  displayName: 'Publish Test Results'
+  displayName: 'Publish Cypress Test Results'
