@@ -2,38 +2,26 @@ trigger:
   branches:
     include:
       - master  # Altere para a branch que você deseja monitorar (ex: master ou main)
-
 pool:
-  vmImage: 'ubuntu-latest'  # Usa a imagem mais recente do Ubuntu
+  vmImage: 'ubuntu-latest'
 
 steps:
-# 1. Instalar o Node.js
 - task: UseNode@1
   inputs:
-    versionSpec: '14.x'  # Versão do Node.js, ajuste conforme necessário
+    versionSpec: '14.x'  # Ou qualquer versão necessária
   displayName: 'Install Node.js'
 
-# 2. Instalar as dependências do projeto
 - script: |
     npm install
   displayName: 'Install dependencies'
 
-# 3. Rodar os testes do Cypress
 - script: |
     npx cypress run --reporter mochawesome
   displayName: 'Run Cypress Tests'
 
-# 4. Gerar o relatório de testes
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'cypress/results'  # Pasta onde os resultados de teste são armazenados
+    PathtoPublish: 'cypress/results'
     ArtifactName: 'TestResults'
     publishLocation: 'Container'
   displayName: 'Publish Test Results'
-
-# 5. Publicar os relatórios Mochawesome (opcional)
-- task: PublishTestResults@2
-  inputs:
-    testResultsFiles: '**/mochawesome-report/*.json'
-    testRunTitle: 'Cypress Test Run'
-  displayName: 'Publish Cypress Test Results'
