@@ -1,21 +1,39 @@
-# Node.js
-# Build a general Node.js project with npm.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
-- master
+- main  # Ou a branch que você deseja que acione o pipeline
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'  # A máquina virtual onde o pipeline será executado
 
 steps:
-- task: NodeTool@0
+# Passo 1: Instalar o Node.js
+- task: UseNode@1
   inputs:
-    versionSpec: '20.x'
+    versionSpec: '14.x'  # Versão do Node.js, você pode mudar conforme necessário
   displayName: 'Install Node.js'
 
+# Passo 2: Fazer o checkout do repositório
+- task: Checkout@1
+  displayName: 'Checkout GitHub Repository'
+
+# Passo 3: Instalar as dependências do projeto
 - script: |
     npm install
-    npm run build
-  displayName: 'npm install and build'
+  displayName: 'Install Dependencies'
+
+# Passo 4: Executar os testes Cypress
+- script: |
+    npx cypress run
+  displayName: 'Run Cypress Tests'
+
+# Passo 5: Publicar os resultados do teste (se você estiver usando Mochawesome)
+- script: |
+    npx mochawesome-merge cypress/reports/*.json > cypress/reports/all-tests.json
+    npx mochawesome-report-generator cypress/reports/all-tests.json
+  displayName: 'Generate and Publish Test Reports'
+
+# Passo 6: Publicar os resultados no Azure DevOps (formato JUnit)
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: 'cypress/results/**/*.xml'
+    testRunTitle: 'Cypress Test Run'
+  displayName: 'Publish Test Results'
