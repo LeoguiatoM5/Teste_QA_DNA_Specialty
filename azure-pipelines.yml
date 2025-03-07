@@ -1,27 +1,37 @@
 trigger:
   branches:
     include:
-      - master  # Altere para a branch que você deseja monitorar (ex: master ou main)
-pool:
-  vmImage: 'ubuntu-latest'
+      - master
 
-steps:
-- task: UseNode@1
-  inputs:
-    versionSpec: '14.x'  # Ou qualquer versão necessária
-  displayName: 'Install Node.js'
+jobs:
+- job: TestJob
+  pool:
+    vmImage: 'ubuntu-latest'
 
-- script: |
-    npm install
-  displayName: 'Install dependencies'
+  steps:
+    # Instala o Node.js
+    - task: UseNode@2
+      inputs:
+        versionSpec: '14.x'
+        addToPath: true
 
-- script: |
-    npx cypress run --reporter mochawesome
-  displayName: 'Run Cypress Tests'
+    # Instala dependências do projeto
+    - script: |
+        npm install
+      displayName: 'Install dependencies'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: 'cypress/results'
-    ArtifactName: 'TestResults'
-    publishLocation: 'Container'
-  displayName: 'Publish Test Results'
+    # Executa o Cypress
+    - script: |
+        npx cypress run
+      displayName: 'Run Cypress Tests'
+
+    # Se você quiser rodar o Cypress com o Mochawesome Reporter, faça isso:
+    - script: |
+        npx cypress run --reporter mochawesome --reporter-options reportDir=cypress/results
+      displayName: 'Run Cypress with Mochawesome Reporter'
+
+    # Caso queira também gerar relatórios com mochawesome-merge e mochawesome-report-generator
+    - script: |
+        npx mochawesome-merge cypress/results/*.json > cypress/results/report.json
+        npx mochawesome-report-generator cypress/results/report.json --reportDir=cypress/results
+      displayName: 'Generate Mochawesome Report'
