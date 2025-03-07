@@ -9,28 +9,23 @@ jobs:
     vmImage: 'ubuntu-latest'
 
   steps:
-    # Instala o Node.js
-    - task: UseNode@2
+    # Instalar Node.js usando a task NodeTool
+    - task: NodeTool@0
       inputs:
         versionSpec: '14.x'
         addToPath: true
 
-    # Instala dependências do projeto
+    # Instalar dependências do projeto
     - script: |
         npm install
       displayName: 'Install dependencies'
 
-    # Executa o Cypress
+    # Executar o Cypress
     - script: |
         npx cypress run
       displayName: 'Run Cypress Tests'
 
-    # Se você quiser rodar o Cypress com o Mochawesome Reporter, faça isso:
-    - script: |
-        npx cypress run --reporter mochawesome --reporter-options reportDir=cypress/results
-      displayName: 'Run Cypress with Mochawesome Reporter'
-
-    # Caso queira também gerar relatórios com mochawesome-merge e mochawesome-report-generator
+    # Gerar relatórios com Mochawesome
     - script: |
         npx mochawesome-merge cypress/results/*.json > cypress/results/report.json
         npx mochawesome-report-generator cypress/results/report.json --reportDir=cypress/results
