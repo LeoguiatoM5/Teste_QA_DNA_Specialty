@@ -1,0 +1,34 @@
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  name: 'Default' # Nome do pool onde seu agente local está registrado
+  demands:
+    - Agent.Name -equals MeuAgenteLocal # Substitua pelo nome do seu agente, ex: "MeuAgenteLocal"
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '14.x'
+    displayName: 'Install Node.js'
+
+  - script: |
+      npm install
+    displayName: 'Install dependencies'
+
+  - script: |
+      npx cypress run --reporter junit --reporter-options "mochaFile=results/my-test-output-[hash].xml" || true
+    displayName: 'Run Cypress tests'
+    continueOnError: true
+
+  - script: |
+      npx junit-report-merger ./results/combined.xml "./results/my-test-output-*.xml"
+    displayName: 'Merge JUnit test files'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: './results/combined.xml'
+      testRunTitle: 'Cypress test results'

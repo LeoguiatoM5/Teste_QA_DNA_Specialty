@@ -1,1 +1,0 @@
-https://github.com/LeoguiatoM5/Teste_QA_DNA_Specialty/tree/master
