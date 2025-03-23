@@ -4,9 +4,9 @@ trigger:
       - master
 
 pool:
-  name: 'Default' # Nome do pool onde seu agente local está registrado
+  name: 'Default' 
   demands:
-    - Agent.Name -equals MeuAgenteLocal # Substitua pelo nome do seu agente, ex: "MeuAgenteLocal"
+    - Agent.Name -equals MeuAgenteLocal 
 
 steps:
   - task: NodeTool@0
